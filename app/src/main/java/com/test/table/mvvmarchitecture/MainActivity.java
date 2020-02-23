@@ -165,18 +165,12 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 private void getFilteredBusinesses(String businessTitle) {
-                    businessViewModel.getFilteredBusinesses(businessTitle).observe(MainActivity.this, new Observer<List<Business>>() {
+                    String businessTitleQuery = businessTitle.toLowerCase().trim();
+                    businessTitleQuery="%"+businessTitleQuery+"%";
+                    businessViewModel.getFilteredBusinesses(businessTitleQuery).observe(MainActivity.this, new Observer<List<Business>>() {
                         @Override
                         public void onChanged(@Nullable List<Business> businesses) {
-                            if(businesses!=null) {
-                                if(businesses.size()>0){
-                                    adapter.submitList(businesses);
-                                }
-                                else{
-                                    LiveData<List<Business>> businesses2=businessViewModel.getAllBusinesses();
-                                    adapter.submitList(businesses2.getValue());
-                                }
-                            }
+                           adapter.submitList(businesses);
                         }
                     });
 
