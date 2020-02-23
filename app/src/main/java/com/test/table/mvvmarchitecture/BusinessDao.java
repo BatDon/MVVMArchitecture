@@ -29,7 +29,4 @@ public interface BusinessDao {
 
     @Query("SELECT * FROM business_table WHERE title LIKE :businessTitle")
     LiveData<List<Business>> getFilteredBusinesses(String businessTitle);
-
-//    @Query("SELECT COUNT(title) FROM business_table")
-//            int getBusinessCount();
 }

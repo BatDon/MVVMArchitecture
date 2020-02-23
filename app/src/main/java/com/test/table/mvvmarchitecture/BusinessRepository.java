@@ -105,17 +105,4 @@ public class BusinessRepository {
         }
     }
 
-//    private static class GetBusinessCountAsyncTask extends AsyncTask<Business, Void, Void> {
-//        private BusinessDao businessDao;
-//
-//        private getBusinessCountAsyncTask(BusinessDao businessDao) {
-//            this.businessDao = businessDao;
-//        }
-//
-//        @Override
-//        protected Void doInBackground(Business... businesses) {
-//            int businessCount=businessDao.getBusinessCount();
-//            return businessCount;
-//        }
-//    }
 }
