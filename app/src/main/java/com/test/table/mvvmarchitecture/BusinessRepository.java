@@ -1,6 +1,7 @@
 package com.test.table.mvvmarchitecture;
 
 import android.app.Application;
+import android.content.Context;
 import android.os.AsyncTask;
 
 import androidx.lifecycle.LiveData;
@@ -10,6 +11,7 @@ import java.util.List;
 public class BusinessRepository {
     private BusinessDao businessDao;
     private LiveData<List<Business>> allBusinesses;
+    private LiveData<List<Business>> filteredBusinesses;
 
     public BusinessRepository(Application application) {
         BusinessDatabase database = BusinessDatabase.getInstance(application);
@@ -36,6 +38,16 @@ public class BusinessRepository {
     public LiveData<List<Business>> getAllBusinesses() {
         return allBusinesses;
     }
+
+    public LiveData<List<Business>> getFilteredBusinesses(String businessTitle) {
+        filteredBusinesses=businessDao.getFilteredBusinesses(businessTitle);
+        return filteredBusinesses;
+    }
+
+//    public int getBusinessCount(){
+//        new GetBusinessCountAsyncTask(businessDao).execute(business);
+//    }
+
 
     private static class InsertBusinessAsyncTask extends AsyncTask<Business, Void, Void> {
         private BusinessDao businessDao;
@@ -92,4 +104,18 @@ public class BusinessRepository {
             return null;
         }
     }
+
+//    private static class GetBusinessCountAsyncTask extends AsyncTask<Business, Void, Void> {
+//        private BusinessDao businessDao;
+//
+//        private getBusinessCountAsyncTask(BusinessDao businessDao) {
+//            this.businessDao = businessDao;
+//        }
+//
+//        @Override
+//        protected Void doInBackground(Business... businesses) {
+//            int businessCount=businessDao.getBusinessCount();
+//            return businessCount;
+//        }
+//    }
 }

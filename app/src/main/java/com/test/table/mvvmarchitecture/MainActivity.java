@@ -4,14 +4,18 @@ package com.test.table.mvvmarchitecture;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.ItemTouchHelper;
@@ -27,11 +31,15 @@ public class MainActivity extends AppCompatActivity {
     public static final int EDIT_BUSINESS_REQUEST = 2;
 
     private BusinessViewModel businessViewModel;
+    private BusinessViewModel businessFilteredViewModel;
+    private BusinessAdapter adapter;
+    private SearchView searchView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Toast.makeText(this, "MainActivity onCreate", Toast.LENGTH_SHORT).show();
 
         FloatingActionButton buttonAddBusiness = findViewById(R.id.button_add_business);
         buttonAddBusiness.setOnClickListener(new View.OnClickListener() {
@@ -45,10 +53,12 @@ public class MainActivity extends AppCompatActivity {
         RecyclerView recyclerView = findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setHasFixedSize(true);
+        adapter = new BusinessAdapter();
 
-        final BusinessAdapter adapter = new BusinessAdapter();
+//        final BusinessAdapter adapter = new BusinessAdapter();
+        businessFilteredViewModel = ViewModelProviders.of(this).get(BusinessViewModel.class);
+
         recyclerView.setAdapter(adapter);
-
         businessViewModel = ViewModelProviders.of(this).get(BusinessViewModel.class);
         businessViewModel.getAllBusinesses().observe(this, new Observer<List<Business>>() {
             @Override
@@ -123,6 +133,14 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater menuInflater = getMenuInflater();
         menuInflater.inflate(R.menu.main_menu, menu);
+
+        searchView = (SearchView) menu.findItem(R.id.action_search)
+                .getActionView();
+
+        searchView.setSubmitButtonEnabled(true);
+        searchView.setOnQueryTextListener(onQueryTextListener);
+        searchView.setImeOptions(EditorInfo.IME_ACTION_DONE);
+
         return true;
     }
 
@@ -137,4 +155,47 @@ public class MainActivity extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
         }
     }
+
+
+
+
+    private SearchView.OnQueryTextListener onQueryTextListener =
+            new SearchView.OnQueryTextListener() {
+                @Override
+                public boolean onQueryTextSubmit(String query) {
+                    getFilteredBusinesses(query);
+                    return true;
+                }
+
+                @Override
+                public boolean onQueryTextChange(String newText) {
+                    getFilteredBusinesses(newText);
+                    return true;
+                }
+
+                private void getFilteredBusinesses(String businessTitle) {
+                    Toast.makeText(MainActivity.this, "getFilteredBusinesses", Toast.LENGTH_SHORT).show();
+
+                    businessViewModel.getFilteredBusinesses(businessTitle).observe(MainActivity.this, new Observer<List<Business>>() {
+                        @Override
+                        public void onChanged(@Nullable List<Business> businesses) {
+                            boolean update=false;
+                            if(businesses!=null) {
+                                if(businesses.size()>0){
+                                    Log.i("MainActivity", "" + businesses.size());
+                                    Log.i("MainActivity", "onChanged");
+                                    adapter.submitList(businesses);
+                                }
+                                else{
+                                    LiveData<List<Business>> businesses2=businessViewModel.getAllBusinesses();
+                                    adapter.submitList(businesses2.getValue());
+                                }
+                                Log.i("MainActivity", "" + businesses.size());
+                                Log.i("MainActivity", "onChanged");
+                            }
+                        }
+                    });
+
+                }
+            };
 }

@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">MVVMArchitecture</string>
+    <string name="business_name">Business Ranking</string>
 </resources>
